@@ -1,0 +1,17 @@
+# Imagen base
+FROM ubuntu
+# Actualizar repositorio y instalar paquetes necesarios
+RUN apt-get update && apt-get install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install --yes nodejs
+# Copiar el código
+COPY ["app/package.json","app/entrypoint.sh","/usr/src/"]
+
+COPY . .
+# Instalar dependencias necesarias
+RUN npm install
+# Exponer el puerto del servidor web
+EXPOSE 8080
+# Inicializar el proceso
+#ENTRYPOINT [ "entrypoint2.sh" ]
+#CMD ["start"]

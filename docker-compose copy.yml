@@ -1,0 +1,40 @@
+services:
+  app: 
+   container_name: webapp
+   build: .
+   environment: 
+    DB_SERVICE_HOST: 'mongoDB' 
+    DB_NAME: 'test'
+    DB_SERVICE: 'mongoDB'
+    DB_SERVICE_PORT: 27017
+    APP_PUBLIC_DOMAIN: 'localhost'
+   volumes:
+     - volumeApp:${PWD}/app/:/usr/src/data
+     - ${PWD}/app/:/usr/src/app
+   working_dir : /usr/src/app
+   command: "start"
+   depends_on:
+    - mongo_db
+   ports:
+    - '8081:3000'
+   networks:
+    - my_local_network
+   restart: unless-stopped
+  mongo_db:
+   container_name: mongoDB
+   image: fabiosan75/mongo_alpine_3_17:1.0 #harbor.tallerdevops.com/actividad3fabioandressanchezbernal/fabiosan75/mongo_alpine_3_17:1.0 #testmongoalpine:1:0
+   #build: ./mongodb.Dockerfile
+   ports:
+    - '27017'
+   volumes:
+    - ./database-data:/data/db
+   networks:
+    - my_local_network
+   restart: unless-stopped
+
+volumes:
+ volumeApp:
+  external: true
+
+networks:
+  my_local_network:

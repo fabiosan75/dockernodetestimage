@@ -1,0 +1,51 @@
+# Docker Compose Actividad Tema 4
+# Desplegar aplicacion Web y BD Mongo exponer puerto 8081 sobre red $my_local_network.
+# Para servicio webapp se hace build de la imagen del fuente DEV de aplicacion.
+# Para la MongoDB se usa la imagen generada propia pues no hay oficial y que fue 
+# registrada en harbor :
+# Persistencia de datos para BD DIR [./database-data]
+# Persistencia de datos webApp DIR [./data]
+# Mongo image: harbor.tallerdevops.com/actividad3fabioandressanchezbernal/mongo_alpine_3_17:1.0 
+# webApp image: harbor.tallerdevops.com/actividad3fabioandressanchezbernal/fabiosan75/nodeappimg:1.0
+# @version  : 1.0
+# @date     : 2023-04-22
+# @author   fabiosan75 <fabiosan75@gmail.com>
+# @link     https://github.com/fabiosan75
+
+version: "3.8"
+
+services:
+  app: 
+   container_name: webapp
+   build: .
+   environment: 
+    DB_SERVICE_HOST: 'mongoDB' 
+    DB_NAME: 'test'
+    DB_SERVICE: 'mongoDB'
+    DB_SERVICE_PORT: 27017
+    APP_PUBLIC_DOMAIN: 'localhost'
+   volumes:
+      - ./data:/app/data       
+   working_dir : /app
+   command: "start"
+   depends_on:
+    - mongo_db
+   ports:
+    - '8081:3000'
+   networks:
+    - my_local_network
+   restart: unless-stopped
+
+  mongo_db:
+   container_name: mongoDB
+   image: harbor.tallerdevops.com/actividad3fabioandressanchezbernal/mongo_alpine_3_17:1.0 
+   ports:
+    - '27017'
+   volumes:
+    - ./database-data:/data/db
+   networks:
+    - my_local_network
+   restart: unless-stopped
+
+networks:
+  my_local_network:
